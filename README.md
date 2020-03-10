@@ -31,7 +31,7 @@ Build two images:
 - nginx: http server
 
 ```bash
-$ docker build --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) -t $DOCKER_USERNAME/dockerizing-rails-drkiq:latest -f Dockerfile.production .
-$ docker build --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) -t $DOCKER_USERNAME/dockerizing-rails-nginx:latest -f Dockerfile.nginx .
+$ docker build --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) -t $DOCKER_USERNAME/rails-dockerize_drkiq:latest -f Dockerfile.production .
+$ docker build --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) -t $DOCKER_USERNAME/rails-dockerize_nginx:latest -f Dockerfile.nginx .
 ```
 
