@@ -13,7 +13,7 @@ blocks:
             - 'docker pull $DOCKER_USERNAME/rails-dockerize_drkiq:latest || true'
             - 'docker build -t $DOCKER_USERNAME/rails-dockerize_drkiq:latest --cache-from=$DOCKER_USERNAME/rails-dockerize_drkiq:latest --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) -f Dockerfile.production .'
             - 'docker push $DOCKER_USERNAME/rails-dockerize_drkiq:latest'
-        - name: 'Job #2'
+        - name: Build nginx
           commands:
             - 'docker pull $DOCKER_USERNAME/dockerize-rails_nginx:latest || true'
             - 'docker build -t $DOCKER_USERNAME/dockerize-rails_nginx:latest --cache-from=$DOCKER_USERNAME/dockerize-rails_nginx:latest -f Dockerfile.nginx .'
@@ -24,3 +24,20 @@ blocks:
         commands:
           - checkout
           - 'echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin'
+  - name: Tests
+    task:
+      secrets:
+        - name: dockerhub
+      prologue:
+        commands:
+          - 'checkout '
+          - cp env-example .env
+          - cat docker-compose.test.yml | envsubst | tee docker-compose.yml
+          - 'echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin'
+          - 'docker pull $DOCKER_USERNAME/dockerize-rails_drkiq:latest || true'
+          - 'docker-compose run --user "$(id -u):$(id -g)" drkiq rake db:reset'
+          - 'docker-compose run --user "$(id -u):$(id -g)" drkiq rake db:migrate'
+      jobs:
+        - name: Rails Test
+          commands:
+            - 'docker-compose run --user "$(id -u):$(id -g)" drkiq rails test'
